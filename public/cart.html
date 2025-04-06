@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link rel="shortcut icon" type="image" href="./image/logo2.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <!-- bootstrap links -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- fonts links -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+    <!-- Firebase -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+      import { getDatabase, ref, onValue, remove, update, set } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+      // Konfigurasi Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyAalKEO00lcy21YRRSXR1Q9wVSUmQGcPJM",
+        authDomain: "eshop-97f97.firebaseapp.com",
+        databaseURL: "https://eshop-97f97-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "eshop-97f97",
+        storageBucket: "eshop-97f97.firebasestorage.app",
+        messagingSenderId: "534719249406",
+        appId: "1:534719249406:web:5b8a5a217346cd17d45eaf",
+        measurementId: "G-QM0JPNB3R6"
+      };
+
+      // Inisialisasi Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+      const cartRef = ref(database, "cart");
+
+      // Fungsi untuk menampilkan data keranjang
+      function renderCart() {
+        const cartItems = document.getElementById("cart-items");
+        cartItems.innerHTML = ""; // Kosongkan tabel sebelum render ulang
+
+        onValue(cartRef, (snapshot) => {
+          let total = 0;
+          snapshot.forEach((childSnapshot) => {
+            const key = childSnapshot.key;
+            const data = childSnapshot.val();
+
+            // Cek apakah produk sudah ada di tabel
+            let existingRow = document.querySelector(`[data-key="${key}"]`);
+            if (existingRow) {
+              // Perbarui jumlah dan total harga
+              const quantityInput = existingRow.querySelector(".quantity");
+              const totalCell = existingRow.querySelector(".total-price");
+              quantityInput.value = data.quantity;
+              totalCell.textContent = `$${(data.price * data.quantity).toFixed(2)}`;
+            } else {
+              // Tambahkan baris baru jika produk belum ada
+              const row = document.createElement("tr");
+              row.setAttribute("data-key", key);
+              row.innerHTML = `
+                <td><img src="${data.image || './image/placeholder.png'}" alt="${data.name}" width="50"></td>
+                <td>${data.name}</td>
+                <td>$${data.price}</td>
+                <td><input type="number" value="${data.quantity}" min="1" class="form-control quantity" data-key="${key}" aria-label="Quantity"></td>
+                <td class="total-price">$${(data.price * data.quantity).toFixed(2)}</td>
+                <td><button class="btn btn-danger btn-sm remove-item" data-key="${key}" aria-label="Remove ${data.name}">Remove</button></td>
+              `;
+              cartItems.appendChild(row);
+            }
+
+            total += data.price * data.quantity;
+          });
+
+          document.getElementById("cart-total").textContent = `$${total.toFixed(2)}`;
+        });
+      }
+
+      // Fungsi untuk menghapus item dari keranjang
+      document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("remove-item")) {
+          const key = e.target.getAttribute("data-key");
+          remove(ref(database, `cart/${key}`))
+            .then(() => {
+              // Hapus baris dari tabel
+              const row = document.querySelector(`[data-key="${key}"]`);
+              if (row) row.remove();
+            })
+            .catch((error) => {
+              console.error("Error removing item:", error);
+            });
+        }
+      });
+
+      // Fungsi untuk memperbarui jumlah item
+      document.addEventListener("input", (e) => {
+        if (e.target.classList.contains("quantity")) {
+          const key = e.target.getAttribute("data-key");
+          const newQuantity = parseInt(e.target.value);
+
+          if (isNaN(newQuantity) || newQuantity < 1) {
+            e.target.value = 1; // Reset to 1 if invalid
+            return;
+          }
+
+          update(ref(database, `cart/${key}`), { quantity: newQuantity })
+            .catch((error) => {
+              console.error("Error updating quantity:", error);
+            });
+        }
+      });
+
+      // Render keranjang saat halaman dimuat
+      document.addEventListener("DOMContentLoaded", renderCart);
+    </script>
+</head>
+<body>
+
+    <!-- top navbar -->
+    <div class="top-navbar">
+        <div class="top-icons">
+            <i class="fa-brands fa-twitter"></i>
+            <i class="fa-brands fa-facebook-f"></i>
+            <i class="fa-brands fa-instagram"></i>
+        </div>
+        <div class="other-links">
+            <button id="btn-login"><a href="login.html">Login</a></button>
+            <button id="btn-signup"><a href="signup.html">Sign up</a></button>
+            <i class="fa-solid fa-user"></i>
+            <i class="fa-solid fa-cart-shopping"></i>
+        </div>
+    </div>
+    <!-- top navbar -->
+
+    <!-- navbar -->
+    <nav class="navbar navbar-expand-lg" id="navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><img src="image/logo.png" alt="Logo" width="180px"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span><i class="fa-solid fa-bars" style="color: white;"></i></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="clothe.html">Clothe</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contact.html">Contact Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="cart.html">Cart</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- navbar -->
+
+    <!-- Shopping Cart -->
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Your Shopping Cart</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Product</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="cart-items">
+                    <!-- Data keranjang akan dirender di sini -->
+                </tbody>
+            </table>
+        </div>
+        <div class="text-end">
+            <h4>Total: <span id="cart-total">$0.00</span></h4>
+            <button class="btn btn-success mt-3" id="checkout-btn">Checkout</button>
+        </div>
+    </div>
+
+    <!-- footer -->
+    <footer id="footer" style="margin-top: 50px;">
+        <div class="footer-top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 footer-content">
+                        <h3>MAXIn</h3>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus, hic?</p>
+                        <p>
+                            Singapore <br>
+                            768433 <br>
+                        </p>
+                        <strong><i class="fas fa-phone"></i> Phone: <strong>+65 91426096</strong></strong><br>
+                        <strong><i class="fa-solid fa-envelope"></i> Email: <strong>anikmonica28@gmail.com</strong></strong>
+                    </div>
+                    <div class="col-lg-3 col-md-6 footer-links">
+                        <h4>Useful Links</h4>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="about.html">About</a></li>
+                            <li><a href="contact.html">Contact</a></li>
+                            <li><a href="#">Services</a></li>
+                            <li><a href="#">Privacy policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-3 col-md-6 footer-links">
+                        <h4>Our Services</h4>
+                        <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Modi, rem!</p>
+                        <ul>
+                            <li><a href="#">Smart phone</a></li>
+                            <li><a href="#">Smart watch</a></li>
+                            <li><a href="#">Airpods</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-3 col-md-6 footer-links">
+                        <h4>Our Social Network</h4>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem, ad?</p>
+                        <div class="social-links mt-3">
+                            <a href="#" class="twitter"><i class="fa-brands fa-twitter"></i></a>
+                            <a href="#" class="facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                            <a href="#" class="google-plus"><i class="fa-brands fa-google-plus"></i></a>
+                            <a href="#" class="instagram"><i class="fa-brands fa-instagram"></i></a>
+                            <a href="#" class="linkedin"><i class="fa-brands fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="container py-4">
+            <div class="copyright">
+                &copy; Copyright <strong>MAXIn</strong>. All Rights Reserved
+            </div>
+            <div class="credits">
+                Designed By <a href="#">SA coding</a>
+            </div>
+        </div>
+    </footer>
+    <!-- footer -->
+
+    <a href="#" class="arrow"><i><img src="./image/up-arrow.png" alt="" width="50px"></i></a>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+</body>
+</html>
