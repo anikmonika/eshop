@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "bootstrap": "^5.3.5",
+    "eshop": "file:",
     "firebase": "^11.6.0",
     "sweetalert2": "^11.17.2"
   }
