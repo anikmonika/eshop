@@ -15,20 +15,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
     <!-- Firebase -->
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-      import { getDatabase, ref, onValue, remove, update, set } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
-
-      // Konfigurasi Firebase
-      const firebaseConfig = {
-        apiKey: "AIzaSyAalKEO00lcy21YRRSXR1Q9wVSUmQGcPJM",
-        authDomain: "eshop-97f97.firebaseapp.com",
-        databaseURL: "https://eshop-97f97-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "eshop-97f97",
-        storageBucket: "eshop-97f97.firebasestorage.app",
-        messagingSenderId: "534719249406",
-        appId: "1:534719249406:web:5b8a5a217346cd17d45eaf",
-        measurementId: "G-QM0JPNB3R6"
-      };
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+      import { getDatabase, ref, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+      import { firebaseConfig } from "./js/firebase-config.js"; // Impor konfigurasi Firebase
 
       // Inisialisasi Firebase
       const app = initializeApp(firebaseConfig);
@@ -46,27 +35,28 @@
             const key = childSnapshot.key;
             const data = childSnapshot.val();
 
-            // Cek apakah produk sudah ada di tabel
-            let existingRow = document.querySelector(`[data-key="${key}"]`);
-            if (existingRow) {
-              // Perbarui jumlah dan total harga
-              const quantityInput = existingRow.querySelector(".quantity");
-              const totalCell = existingRow.querySelector(".total-price");
-              quantityInput.value = data.quantity;
-              totalCell.textContent = `$${(data.price * data.quantity).toFixed(2)}`;
-            } else {
-              // Tambahkan baris baru jika produk belum ada
-              const row = document.createElement("tr");
+            // Tambahkan baris baru jika produk belum ada
+            let row = document.querySelector(`[data-key="${key}"]`);
+            if (!row) {
+              row = document.createElement("tr");
               row.setAttribute("data-key", key);
               row.innerHTML = `
                 <td><img src="${data.image || './image/placeholder.png'}" alt="${data.name}" width="50"></td>
                 <td>${data.name}</td>
-                <td>$${data.price}</td>
-                <td><input type="number" value="${data.quantity}" min="1" class="form-control quantity" data-key="${key}" aria-label="Quantity"></td>
+                <td class="price">$${data.price}</td>
+                <td>
+                  <button class="btn btn-sm btn-secondary decrease-quantity" data-key="${key}">-</button>
+                  <span class="quantity">${data.quantity}</span>
+                  <button class="btn btn-sm btn-secondary increase-quantity" data-key="${key}">+</button>
+                </td>
                 <td class="total-price">$${(data.price * data.quantity).toFixed(2)}</td>
-                <td><button class="btn btn-danger btn-sm remove-item" data-key="${key}" aria-label="Remove ${data.name}">Remove</button></td>
+                <td><button class="btn btn-danger btn-sm remove-item" data-key="${key}">Remove</button></td>
               `;
               cartItems.appendChild(row);
+            } else {
+              // Perbarui jumlah dan total harga jika baris sudah ada
+              row.querySelector(".quantity").textContent = data.quantity;
+              row.querySelector(".total-price").textContent = `$${(data.price * data.quantity).toFixed(2)}`;
             }
 
             total += data.price * data.quantity;
@@ -82,7 +72,6 @@
           const key = e.target.getAttribute("data-key");
           remove(ref(database, `cart/${key}`))
             .then(() => {
-              // Hapus baris dari tabel
               const row = document.querySelector(`[data-key="${key}"]`);
               if (row) row.remove();
             })
@@ -92,21 +81,43 @@
         }
       });
 
-      // Fungsi untuk memperbarui jumlah item
-      document.addEventListener("input", (e) => {
-        if (e.target.classList.contains("quantity")) {
+      // Fungsi untuk menambah jumlah item
+      document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("increase-quantity")) {
           const key = e.target.getAttribute("data-key");
-          const newQuantity = parseInt(e.target.value);
+          const quantityElement = e.target.closest("tr").querySelector(".quantity");
+          const currentQuantity = parseInt(quantityElement.textContent);
 
-          if (isNaN(newQuantity) || newQuantity < 1) {
-            e.target.value = 1; // Reset to 1 if invalid
-            return;
+          // Validasi nilai quantity
+          if (!isNaN(currentQuantity)) {
+            const newQuantity = currentQuantity + 1;
+            update(ref(database, `cart/${key}`), { quantity: newQuantity })
+              .catch((error) => {
+                console.error("Error updating quantity:", error);
+              });
+          } else {
+            console.error("Invalid quantity value: NaN");
           }
+        }
+      });
 
-          update(ref(database, `cart/${key}`), { quantity: newQuantity })
-            .catch((error) => {
-              console.error("Error updating quantity:", error);
-            });
+      // Fungsi untuk mengurangi jumlah item
+      document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("decrease-quantity")) {
+          const key = e.target.getAttribute("data-key");
+          const quantityElement = e.target.closest("tr").querySelector(".quantity");
+          const currentQuantity = parseInt(quantityElement.textContent);
+
+          // Validasi nilai quantity
+          if (!isNaN(currentQuantity) && currentQuantity > 1) {
+            const newQuantity = currentQuantity - 1;
+            update(ref(database, `cart/${key}`), { quantity: newQuantity })
+              .catch((error) => {
+                console.error("Error updating quantity:", error);
+              });
+          } else if (isNaN(currentQuantity)) {
+            console.error("Invalid quantity value: NaN");
+          }
         }
       });
 

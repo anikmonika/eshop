@@ -17,49 +17,37 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Firebase -->
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-      import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+      import { database, ref, push, set } from "./js/firebase-config.js";
 
-      // Konfigurasi Firebase
-      const firebaseConfig = {
-        apiKey: "AIzaSyAalKEO00lcy21YRRSXR1Q9wVSUmQGcPJM",
-        authDomain: "eshop-97f97.firebaseapp.com",
-        databaseURL: "https://eshop-97f97-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "eshop-97f97",
-        storageBucket: "eshop-97f97.firebasestorage.app",
-        messagingSenderId: "534719249406",
-        appId: "1:534719249406:web:5b8a5a217346cd17d45eaf",
-        measurementId: "G-QM0JPNB3R6"
-      };
-
-      // Inisialisasi Firebase
-      const app = initializeApp(firebaseConfig);
-      const database = getDatabase(app);
-
-      // Fungsi untuk menambahkan produk ke keranjang
+      // Function to add a product to the cart
       function addToCart(product) {
         const cartRef = ref(database, "cart");
         const newCartItem = push(cartRef);
         set(newCartItem, product)
           .then(() => {
             Swal.fire({
-              icon: 'success',
-              title: 'Added to Cart',
+              icon: "success",
+              title: "Added to Cart",
               text: `${product.name} has been added to your cart.`,
               showConfirmButton: false,
-              timer: 1500
+              timer: 1500,
             });
+
+            // Redirect to cart page
+            setTimeout(() => {
+              window.location.href = "cart.html";
+            }, 1500);
           })
           .catch((error) => {
             Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
+              icon: "error",
+              title: "Oops...",
               text: error.message,
             });
           });
       }
 
-      // Event listener untuk ikon cart
+      // Add event listeners to cart icons
       document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".cart-icon").forEach((icon) => {
           icon.addEventListener("click", (e) => {
@@ -68,7 +56,7 @@
               name: card.querySelector("h3").textContent,
               price: parseFloat(card.querySelector("h5").textContent.replace("$", "")),
               image: card.querySelector("img").src,
-              quantity: 1
+              quantity: 1,
             };
             addToCart(product);
           });
@@ -245,7 +233,7 @@
                 &copy; Copyright <strong>MAXIn</strong>. All Rights Reserved
             </div>
             <div class="credits">
-                Designed By <a href="#">SA coding</a>
+                Designed By <a href="#">HA coding</a>
             </div>
         </div>
     </footer>
