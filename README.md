@@ -29,3 +29,5 @@ Direktori node_modules:​
 - paket Node.js yang diinstal melalui npm, sesuai dengan daftar dependensi di package.json.​
 
 untuk spesifik lanjut mengenai fitur yang lain masih saya kembangkan dan on progress, struktur dan file yang ada, saya implement integrasi dasar dengan Firebase untuk autentikasi dan database real-time. Untuk detail lebih lanjut mengenai fitur e-commerce lainnya, seperti manajemen produk, keranjang belanja, atau pemrosesan pembayaran masih saya kembangkan.
+
+
