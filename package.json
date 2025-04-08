@@ -10,9 +10,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "body-parser": "^2.2.0",
     "bootstrap": "^5.3.5",
+    "dotenv": "^16.4.7",
     "eshop": "file:",
+    "express": "^5.1.0",
     "firebase": "^11.6.0",
-    "sweetalert2": "^11.17.2"
+    "nodemailer": "^6.10.0",
+    "sweetalert2": "^11.6.13"
   }
 }

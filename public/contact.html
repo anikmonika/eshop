@@ -16,7 +16,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
     <!-- fonts links -->
-    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.4.1/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -125,52 +124,43 @@
 
     <!-- footer -->
     <footer id="footer" style="margin-top: 50px;">
-        <div class="footer-top
+        <div class="footer-top">
+            <!-- Footer content -->
+        </div>
+    </footer>
+    <!-- footer -->
 
-    // Inisialisasi EmailJS
-    (function() {
-        emailjs.init("Gmail"); // Ganti dengan User ID dari EmailJS
-    })();
+    <script>
+        document.getElementById('sendMessage').addEventListener('click', function() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const message = document.getElementById('message').value;
 
-    document.getElementById("sendMessage").addEventListener("click", (e) => {    <script>
-        // Inisialisasi EmailJS
-        (function() {
-            emailjs.init("Gmail"); // Ganti dengan User ID dari EmailJS
-        })();
-    
-        document.getElementById("sendMessage").addEventListener("click", (e) => {
-            e.preventDefault();
-    
-            // Ambil data dari form
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-            const phone = document.getElementById("phone").value;
-            const message = document.getElementById("message").value;
-    
-            // Validasi input
-            if (!name || !email || !message) {
-                alert("Please fill in all required fields.");
-                return;
+            if (name && email && phone && message) {
+                fetch('http://localhost:3000/send-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, phone, message })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Message sent successfully!');
+                    } else {
+                        alert('Failed to send message.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while sending the message.');
+                });
+            } else {
+                alert('Please fill out all fields.');
             }
-    
-            // Kirim email menggunakan EmailJS
-            emailjs.send("YOUR_SERVICE_ID", "AiOERHFLNXmhC6_CT", {
-                from_name: name,
-                from_email: email,
-                phone: phone,
-                message: message,
-            }).then(
-                (response) => {
-                    alert("Message sent successfully!");
-                    console.log("SUCCESS!", response.status, response.text);
-                },
-                (error) => {
-                    alert("Failed to send message. Please try again.");
-                    console.error("FAILED...", error);
-                }
-            );
         });
     </script>
-</script>
+
 </body>
 </html>

@@ -46,7 +46,7 @@
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                   <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="public/index.html">Home</a>
+                    <a class="nav-link active" aria-current="page" href="index.html">Home</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="clothe.html">Clothe</a>
@@ -55,7 +55,7 @@
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       Category
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="background-color: #1c1c50;">
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="background-color: #1c1c1c;">
                       <li><a class="dropdown-item" href="#">T-Shirt</a></li>
                       <li><a class="dropdown-item" href="#">Hoodies</a></li>
                       <li><a class="dropdown-item" href="#">Pants</a></li>
@@ -169,7 +169,11 @@
                             <i class="fas fa-star checked"></i>
                             <i class="fas fa-star checked"></i>
                         </div>
-                        <h5>$32.60 <strike>$50</strike> <span><i class="fa-solid fa-cart-shopping"></i></span></h5>
+                        <h5>$32.60 <strike>$50</strike></h5>
+                        <div class="actions">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <i class="fa-solid fa-heart wishlist-icon"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -186,7 +190,11 @@
                             <i class="fas fa-star checked"></i>
                             <i class="fas fa-star checked"></i>
                         </div>
-                        <h5>$56.50 <strike>$60</strike> <span><i class="fa-solid fa-cart-shopping"></i></span></h5>
+                        <h5>$56.50 <strike>$60</strike></h5>
+                        <div class="actions">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <i class="fa-solid fa-heart wishlist-icon"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -203,7 +211,11 @@
                             <i class="fas fa-star checked"></i>
                             <i class="fas fa-star checked"></i>
                         </div>
-                        <h5>$150.5 <strike>$160.50</strike> <span><i class="fa-solid fa-cart-shopping"></i></span></h5>
+                        <h5>$150.5 <strike>$160.50</strike></h5>
+                        <div class="actions">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <i class="fa-solid fa-heart wishlist-icon"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -220,7 +232,11 @@
                             <i class="fas fa-star checked"></i>
                             <i class="fas fa-star checked"></i>
                         </div>
-                        <h5>$50.60 <strike>$56.90</strike> <span><i class="fa-solid fa-cart-shopping"></i></span></h5>
+                        <h5>$50.60 <strike>$56.90</strike></h5>
+                        <div class="actions">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <i class="fa-solid fa-heart wishlist-icon"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -240,7 +256,11 @@
                             <i class="fas fa-star checked"></i>
                             <i class="fas fa-star checked"></i>
                         </div>
-                        <h5>$5.60 <strike>$10.50</strike> <span><i class="fa-solid fa-cart-shopping"></i></span></h5>
+                        <h5>$5.60 <strike>$10.50</strike></h5>
+                        <div class="actions">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <i class="fa-solid fa-heart wishlist-icon"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -257,7 +277,11 @@
                             <i class="fas fa-star checked"></i>
                             <i class="fas fa-star checked"></i>
                         </div>
-                        <h5>$2.30 <strike>$5</strike> <span><i class="fa-solid fa-cart-shopping"></i></span></h5>
+                        <h5>$2.30 <strike>$5</strike></h5>
+                        <div class="actions">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <i class="fa-solid fa-heart wishlist-icon"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -274,7 +298,11 @@
                             <i class="fas fa-star checked"></i>
                             <i class="fas fa-star checked"></i>
                         </div>
-                        <h5>$3.2 <strike>$5.60</strike> <span><i class="fa-solid fa-cart-shopping"></i></span></h5>
+                        <h5>$3.2 <strike>$5.60</strike></h5>
+                        <div class="actions">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <i class="fa-solid fa-heart wishlist-icon"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -291,7 +319,11 @@
                             <i class="fas fa-star checked"></i>
                             <i class="fas fa-star checked"></i>
                         </div>
-                        <h5>$10.50 <strike>$15.60</strike> <span><i class="fa-solid fa-cart-shopping"></i></span></h5>
+                        <h5>$10.50 <strike>$15.60</strike></h5>
+                        <div class="actions">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <i class="fa-solid fa-heart wishlist-icon"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -500,17 +532,47 @@
 
         // Ambil detail produk dari elemen kartu
         const productCard = icon.closest(".card");
+        if (!productCard) {
+          console.error("Product card not found for the clicked cart icon.");
+          return;
+        }
+
+        const productName = productCard.querySelector("h3")?.textContent || "Unknown Product";
+        const productPriceElement = productCard.querySelector("h5");
+        const productPrice = productPriceElement
+          ? parseFloat(productPriceElement.textContent.split(" ")[0].replace("$", ""))
+          : 0;
+        const productImage = productCard.querySelector("img")?.src || "";
+
+        if (!productName || !productPrice || !productImage) {
+          console.error("Failed to retrieve product details.");
+          return;
+        }
+
         const product = {
-          name: productCard.querySelector("h3").textContent,
-          price: parseFloat(productCard.querySelector("h5").textContent.split(" ")[0].replace("$", "")),
-          image: productCard.querySelector("img").src,
+          name: productName,
+          price: productPrice,
+          image: productImage,
           quantity: 1, // Default quantity
         };
 
-        // Tambahkan produk ke keranjang
         addToCart(product);
       });
     });
+  });
+
+  // Event listener untuk ikon keranjang di navbar
+  document.addEventListener("DOMContentLoaded", () => {
+    const cartIcon = document.querySelector(".top-navbar .fa-cart-shopping");
+
+    if (cartIcon) {
+      cartIcon.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = "cart.html"; // Redirect ke halaman cart
+      });
+    } else {
+      console.warn("Cart icon not found in the top navbar.");
+    }
   });
 </script>
 <script>
@@ -556,7 +618,25 @@
           quantity: 1, // Default quantity
         };
 
-        addToCart(product);
+        // Tambahkan produk ke Firebase Realtime Database
+        const cartRef = ref(database, "cart");
+        push(cartRef, product)
+          .then(() => {
+            Swal.fire({
+              icon: "success",
+              title: "Added to Cart",
+              text: `${product.name} has been added to your cart.`,
+              timer: 1500,
+              showConfirmButton: false,
+            });
+          })
+          .catch((error) => {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: `Failed to add to cart: ${error.message}`,
+            });
+          });
       });
     });
   });
@@ -573,6 +653,69 @@
     } else {
       console.warn("Cart icon not found in the top navbar.");
     }
+  });
+</script>
+<script type="module">
+  import { database, ref, push } from "./js/firebase-config.js";
+
+  // Fungsi untuk menambahkan produk ke wishlist
+  function addToWishlist(product) {
+    const wishlistRef = ref(database, "wishlist");
+    push(wishlistRef, product)
+      .then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "Added to Wishlist",
+          text: `${product.name} has been added to your wishlist.`,
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: `Failed to add to wishlist: ${error.message}`,
+        });
+      });
+  }
+
+  // Tambahkan event listener ke semua ikon wishlist
+  document.addEventListener("DOMContentLoaded", () => {
+    const wishlistIcons = document.querySelectorAll(".wishlist-icon");
+
+    wishlistIcons.forEach((icon) => {
+      icon.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        // Ambil detail produk dari elemen kartu
+        const productCard = icon.closest(".card");
+        if (!productCard) {
+          console.error("Product card not found for the clicked wishlist icon.");
+          return;
+        }
+
+        const productName = productCard.querySelector("h3")?.textContent || "Unknown Product";
+        const productPriceElement = productCard.querySelector("h5");
+        const productPrice = productPriceElement
+          ? parseFloat(productPriceElement.textContent.split(" ")[0].replace("$", ""))
+          : 0;
+        const productImage = productCard.querySelector("img")?.src || "";
+
+        if (!productName || isNaN(productPrice) || !productImage) {
+          console.error("Failed to retrieve product details.");
+          return;
+        }
+
+        const product = {
+          name: productName,
+          price: productPrice,
+          image: productImage,
+        };
+
+        addToWishlist(product);
+      });
+    });
   });
 </script>
 

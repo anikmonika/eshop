@@ -35,6 +35,11 @@
             const key = childSnapshot.key;
             const data = childSnapshot.val();
 
+            // Validasi quantity
+            if (isNaN(data.quantity) || data.quantity <= 0) {
+              data.quantity = 1; // Set default quantity
+            }
+
             // Tambahkan baris baru jika produk belum ada
             let row = document.querySelector(`[data-key="${key}"]`);
             if (!row) {
@@ -54,7 +59,7 @@
               `;
               cartItems.appendChild(row);
             } else {
-              // Perbarui jumlah dan total harga jika baris sudah ada
+              // Perbarui jumlah dan total harga
               row.querySelector(".quantity").textContent = data.quantity;
               row.querySelector(".total-price").textContent = `$${(data.price * data.quantity).toFixed(2)}`;
             }
