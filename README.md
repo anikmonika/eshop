@@ -31,3 +31,7 @@ Direktori node_modules:​
 untuk spesifik lanjut mengenai fitur yang lain masih saya kembangkan dan on progress, struktur dan file yang ada, saya implement integrasi dasar dengan Firebase untuk autentikasi dan database real-time. Untuk detail lebih lanjut mengenai fitur e-commerce lainnya, seperti manajemen produk, keranjang belanja, atau pemrosesan pembayaran masih saya kembangkan.
 
 
+
+![Screenshot 2025-04-08 170946](https://github.com/user-attachments/assets/a76a4539-f4a6-4931-9b00-d3d75b3eafc2)
+
+
