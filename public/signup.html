@@ -128,10 +128,49 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script type="module">
       import { auth } from "./js/firebase-config.js";
-      import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+      import {
+        createUserWithEmailAndPassword,
+        sendEmailVerification,
+        applyActionCode,
+      } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+      // Fungsi untuk memeriksa parameter URL
+      function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+      }
+
+      // Periksa apakah pengguna telah diverifikasi
+      if (getQueryParam("mode") === "verifyEmail") {
+        const oobCode = getQueryParam("oobCode"); // Ambil kode verifikasi dari URL
+        if (oobCode) {
+          try {
+            await applyActionCode(auth, oobCode); // Terapkan kode verifikasi
+            Swal.fire({
+              icon: "success",
+              title: "Email Verified!",
+              text: "Your email has been verified successfully. Redirecting to login page...",
+              timer: 3000,
+              showConfirmButton: false,
+            });
+
+            // Redirect ke halaman login setelah 3 detik
+            setTimeout(() => {
+              window.location.href = "./login.html"; // Pastikan URL ini benar
+            }, 3000);
+          } catch (error) {
+            console.error("Error verifying email:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Verification Failed",
+              text: "The verification link is invalid or expired.",
+            });
+          }
+        }
+      }
 
       const signupButton = document.querySelector("#login button");
-      signupButton.addEventListener("click", (e) => {
+      signupButton.addEventListener("click", async (e) => {
         e.preventDefault();
         const name = document.querySelector("input[placeholder='Name']").value;
         const email = document.querySelector("input[placeholder='Email']").value;
@@ -146,37 +185,86 @@
           return;
         }
 
-        createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            const user = userCredential.user;
-
-            Swal.fire({
-              icon: "success",
-              title: "Signup Successful!",
-              text: `Welcome, ${name}`,
-              showConfirmButton: false,
-              timer: 2000,
-            });
-
-            setTimeout(() => {
-              window.location.href = "login.html";
-            }, 2000);
-          })
-          .catch((error) => {
-            if (error.code === "auth/email-already-in-use") {
-              Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Account is already used!",
-              });
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: `Error: ${error.message}`,
-              });
-            }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid Email",
+            text: "Please enter a valid email address.",
           });
+          return;
+        }
+
+        if (password.length < 6) {
+          Swal.fire({
+            icon: "error",
+            title: "Weak Password",
+            text: "Password must be at least 6 characters long.",
+          });
+          return;
+        }
+
+        try {
+          // Buat akun baru
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+
+          // Kirim email verifikasi dengan parameter URL
+          const actionCodeSettings = {
+            url: `${window.location.origin}/public/login.html`, // Ubah ke login.html
+            handleCodeInApp: true,
+          };
+          await sendEmailVerification(user, actionCodeSettings);
+
+          Swal.fire({
+            icon: "success",
+            title: "Signup Successful!",
+            text: `A verification email has been sent to ${email}. Please verify your email to continue.`,
+            showConfirmButton: true,
+          });
+        } catch (error) {
+          if (error.code === "auth/email-already-in-use") {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Account is already used! Please login instead.",
+              showConfirmButton: true,
+              confirmButtonText: "Go to Login",
+            }).then(() => {
+              window.location.href = "login.html";
+            });
+          } else if (error.code === "auth/invalid-email") {
+            Swal.fire({
+              icon: "error",
+              title: "Invalid Email",
+              text: "The email address is badly formatted.",
+            });
+          } else if (error.code === "auth/weak-password") {
+            Swal.fire({
+              icon: "error",
+              title: "Weak Password",
+              text: "Password should be at least 6 characters.",
+            });
+          } else if (error.code === "auth/invalid-api-key") {
+            Swal.fire({
+              icon: "error",
+              title: "Configuration Error",
+              text: "Invalid API Key. Please check your Firebase configuration.",
+            });
+          } else if (error.code === "auth/invalid-continue-uri") {
+            Swal.fire({
+              icon: "error",
+              title: "Configuration Error",
+              text: "Invalid redirect URL. Please check your Firebase Console settings.",
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: `Error: ${error.message}`,
+            });
+          }
+        }
       });
     </script>
 

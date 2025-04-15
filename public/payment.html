@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">Payment</h1>
+
+        <!-- CRUD Address -->
+        <section id="address-section" class="section">
+            <h2>Shipping Address</h2>
+            <!-- Input untuk alamat -->
+            <div id="address-inputs" class="address-inputs">
+                <input type="text" id="full-address" class="address-input" placeholder="Full Address">
+                <input type="text" id="phone-number" class="address-input" placeholder="Phone Number">
+                <input type="text" id="city" class="address-input" placeholder="City">
+                <input type="text" id="postal-code" class="address-input" placeholder="Postal Code">
+            </div>
+            <button id="add-address-btn" class="btn">Add Address</button>
+
+            <!-- Daftar alamat -->
+            <div id="address-list" class="list">
+                <!-- Alamat akan dirender di sini -->
+            </div>
+        </section>
+
+        <!-- CRUD Checkout Products -->
+        <section id="checkout-products" class="section">
+            <h2>Products</h2>
+            <div id="product-list" class="list">
+                <!-- Product list will be dynamically populated -->
+            </div>
+        </section>
+
+        <!-- CRUD Payment Method -->
+        <section id="payment-method" class="section">
+            <h2>Payment Method</h2>
+            <select id="payment-method-select" class="dropdown">
+                <option value="credit-card">Credit Card</option>
+                <option value="paypal">PayPal</option>
+                <option value="bank-transfer">Bank Transfer</option>
+            </select>
+        </section>
+
+        <!-- Voucher Discount -->
+        <section id="voucher-section" class="section">
+            <h2>Voucher</h2>
+            <input type="text" id="voucher-code" class="input" placeholder="Enter voucher code">
+            <button id="apply-voucher-btn" class="btn">Apply</button>
+        </section>
+
+        <!-- Total Payment -->
+        <section id="total-payment" class="section">
+            <h2>Total Payment</h2>
+            <p id="total-amount" class="total">$0.00</p>
+        </section>
+
+        <!-- Place Order -->
+        <button id="place-order-btn" class="btn btn-primary">Place Order</button>
+    </div>
+
+    <script>
+        // CRUD Address
+        const addressList = document.getElementById("address-list");
+        const addAddressBtn = document.getElementById("add-address-btn");
+
+        addAddressBtn.addEventListener("click", () => {
+            // Ambil nilai dari input
+            const fullAddress = document.getElementById("full-address").value.trim();
+            const phoneNumber = document.getElementById("phone-number").value.trim();
+            const city = document.getElementById("city").value.trim();
+            const postalCode = document.getElementById("postal-code").value.trim();
+
+            // Validasi input
+            if (!fullAddress || !phoneNumber || !city || !postalCode) {
+                Swal.fire("Error", "Please fill in all address fields.", "error");
+                return;
+            }
+
+            // Buat elemen alamat baru
+            const addressItem = document.createElement("div");
+            addressItem.classList.add("address-item");
+            addressItem.innerHTML = `
+                <p><strong>Address:</strong> ${fullAddress}</p>
+                <p><strong>Phone:</strong> ${phoneNumber}</p>
+                <p><strong>City:</strong> ${city}</p>
+                <p><strong>Postal Code:</strong> ${postalCode}</p>
+            `;
+
+            // Tombol delete untuk menghapus alamat
+            const deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "Delete";
+            deleteBtn.classList.add("btn-delete");
+            deleteBtn.addEventListener("click", () => {
+                addressList.removeChild(addressItem);
+            });
+
+            addressItem.appendChild(deleteBtn);
+
+            // Tambahkan elemen alamat ke daftar alamat
+            addressList.appendChild(addressItem);
+
+            // Kosongkan input setelah ditambahkan
+            document.getElementById("full-address").value = "";
+            document.getElementById("phone-number").value = "";
+            document.getElementById("city").value = "";
+            document.getElementById("postal-code").value = "";
+        });
+
+        // CRUD Checkout Products
+        const productList = document.getElementById("product-list");
+        const products = [
+            { name: "Product 1", price: 50 },
+            { name: "Product 2", price: 30 },
+        ];
+
+        function renderProducts() {
+            productList.innerHTML = "";
+            products.forEach((product, index) => {
+                const productItem = document.createElement("div");
+                productItem.textContent = `${product.name} - $${product.price}`;
+                productItem.classList.add("product-item");
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.textContent = "Delete";
+                deleteBtn.classList.add("btn-delete");
+                deleteBtn.addEventListener("click", () => {
+                    products.splice(index, 1);
+                    renderProducts();
+                    calculateTotal();
+                });
+
+                productItem.appendChild(deleteBtn);
+                productList.appendChild(productItem);
+            });
+        }
+        renderProducts();
+
+        // CRUD Payment Method
+        const paymentMethodSelect = document.getElementById("payment-method-select");
+
+        paymentMethodSelect.addEventListener("change", () => {
+            console.log(`Selected payment method: ${paymentMethodSelect.value}`);
+        });
+
+        // Voucher Discount
+        const voucherCodeInput = document.getElementById("voucher-code");
+        const applyVoucherBtn = document.getElementById("apply-voucher-btn");
+        let discount = 0;
+
+        applyVoucherBtn.addEventListener("click", () => {
+            const voucherCode = voucherCodeInput.value.trim();
+            if (voucherCode === "DISCOUNT10") {
+                discount = 10;
+                Swal.fire("Voucher Applied", "You received a $10 discount!", "success");
+            } else {
+                discount = 0;
+                Swal.fire("Invalid Voucher", "The voucher code is not valid.", "error");
+            }
+            calculateTotal();
+        });
+
+        // Total Payment
+        const totalAmountElement = document.getElementById("total-amount");
+
+        function calculateTotal() {
+            const total = products.reduce((sum, product) => sum + product.price, 0) - discount;
+            totalAmountElement.textContent = `$${total > 0 ? total.toFixed(2) : 0}`;
+        }
+        calculateTotal();
+
+        // Place Order
+        const placeOrderBtn = document.getElementById("place-order-btn");
+
+        placeOrderBtn.addEventListener("click", () => {
+            if (products.length === 0) {
+                Swal.fire("Error", "No products in the cart.", "error");
+                return;
+            }
+
+            if (addressList.children.length === 0) {
+                Swal.fire("Error", "Please add a shipping address.", "error");
+                return;
+            }
+
+            Swal.fire("Order Placed", "Your order has been successfully placed!", "success");
+        });
+
+        // Fungsi untuk menampilkan data checkout di halaman payment.html
+        document.addEventListener("DOMContentLoaded", () => {
+            const checkoutItems = JSON.parse(localStorage.getItem("checkoutItems")) || [];
+            const productList = document.getElementById("product-list");
+
+            let total = 0;
+
+            // Render produk yang di-checkout
+            checkoutItems.forEach((item) => {
+                const productItem = document.createElement("div");
+                productItem.classList.add("product-item");
+                productItem.innerHTML = `
+                    <div class="product-details">
+                        <img src="${item.image}" alt="${item.name}" width="50">
+                        <span>${item.name}</span>
+                    </div>
+                    <div class="product-quantity">Quantity: ${item.quantity}</div>
+                    <div class="product-price">Price: $${(item.price * item.quantity).toFixed(2)}</div>
+                `;
+
+                productList.appendChild(productItem);
+                total += item.price * item.quantity;
+            });
+
+            // Tampilkan total pembayaran
+            document.getElementById("total-amount").textContent = `$${total.toFixed(2)}`;
+        });
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+        import { firebaseConfig } from "./js/firebase-config.js"; // Impor konfigurasi Firebase
+
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Fungsi untuk menampilkan data checkout dari Firebase
+        document.addEventListener("DOMContentLoaded", () => {
+            const productList = document.getElementById("product-list");
+            const totalAmountElement = document.getElementById("total-amount");
+
+            let total = 0;
+
+            // Ambil data dari Firebase Realtime Database
+            const cartRef = ref(database, "cart");
+            onValue(cartRef, (snapshot) => {
+                productList.innerHTML = ""; // Kosongkan daftar produk sebelum render ulang
+                total = 0; // Reset total pembayaran
+
+                snapshot.forEach((childSnapshot) => {
+                    const key = childSnapshot.key;
+                    const data = childSnapshot.val();
+
+                    const productItem = document.createElement("div");
+                    productItem.classList.add("product-item");
+                    productItem.innerHTML = `
+                        <div class="product-details">
+                            <img src="${data.image || './image/placeholder.png'}" alt="${data.name}" width="50">
+                            <span>${data.name}</span>
+                        </div>
+                        <div class="product-quantity">
+                            <button class="btn btn-sm btn-secondary decrease-quantity" data-key="${key}">-</button>
+                            <span class="quantity">${data.quantity}</span>
+                            <button class="btn btn-sm btn-secondary increase-quantity" data-key="${key}">+</button>
+                        </div>
+                        <div class="product-price">Price: $${(data.price * data.quantity).toFixed(2)}</div>
+                        <button class="btn btn-danger btn-sm remove-product" data-key="${key}">Remove</button>
+                    `;
+
+                    productList.appendChild(productItem);
+                    total += data.price * data.quantity;
+                });
+
+                // Tampilkan total pembayaran
+                totalAmountElement.textContent = `$${total.toFixed(2)}`;
+            });
+
+            // Event listener untuk tombol tambah, kurang, dan hapus
+            productList.addEventListener("click", (e) => {
+                const key = e.target.getAttribute("data-key");
+
+                if (e.target.classList.contains("increase-quantity")) {
+                    // Tambah jumlah produk
+                    const quantityElement = e.target.previousElementSibling;
+                    const newQuantity = parseInt(quantityElement.textContent) + 1;
+                    update(ref(database, `cart/${key}`), { quantity: newQuantity });
+                }
+
+                if (e.target.classList.contains("decrease-quantity")) {
+                    // Kurangi jumlah produk
+                    const quantityElement = e.target.nextElementSibling;
+                    const newQuantity = parseInt(quantityElement.textContent) - 1;
+                    if (newQuantity > 0) {
+                        update(ref(database, `cart/${key}`), { quantity: newQuantity });
+                    } else {
+                        remove(ref(database, `cart/${key}`)); // Hapus produk jika jumlahnya 0
+                    }
+                }
+
+                if (e.target.classList.contains("remove-product")) {
+                    // Hapus produk
+                    remove(ref(database, `cart/${key}`));
+                }
+            });
+        });
+    </script>
+</body>
+</html>

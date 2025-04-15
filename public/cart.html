@@ -47,7 +47,7 @@
               row.setAttribute("data-key", key);
               row.innerHTML = `
                 <td><img src="${data.image || './image/placeholder.png'}" alt="${data.name}" width="50"></td>
-                <td>${data.name}</td>
+                <td class="product-name">${data.name}</td>
                 <td class="price">$${data.price}</td>
                 <td>
                   <button class="btn btn-sm btn-secondary decrease-quantity" data-key="${key}">-</button>
@@ -203,6 +203,30 @@
             <button class="btn btn-success mt-3" id="checkout-btn">Checkout</button>
         </div>
     </div>
+
+    <script>
+      // Fungsi untuk menyimpan data keranjang ke localStorage dan redirect ke payment.html
+      document.getElementById("checkout-btn").addEventListener("click", () => {
+        const cartItems = [];
+        const rows = document.querySelectorAll("#cart-items tr");
+
+        rows.forEach((row) => {
+            const key = row.getAttribute("data-key");
+            const name = row.querySelector(".product-name").textContent;
+            const price = parseFloat(row.querySelector(".price").textContent.replace("$", ""));
+            const quantity = parseInt(row.querySelector(".quantity").textContent);
+            const image = row.querySelector("img").src;
+
+            cartItems.push({ key, name, price, quantity, image });
+        });
+
+        // Simpan data keranjang ke localStorage
+        localStorage.setItem("checkoutItems", JSON.stringify(cartItems));
+
+        // Redirect ke halaman payment.html
+        window.location.href = "payment.html";
+      });
+    </script>
 
     <!-- footer -->
     <footer id="footer" style="margin-top: 50px;">

@@ -15,13 +15,9 @@
     <!-- Firebase -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-      import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+      import { auth } from "./js/firebase-config.js";
+      import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
-      // Inisialisasi Firebase
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-
-      // Logika Login
       document.addEventListener("DOMContentLoaded", () => {
         const loginButton = document.querySelector("#login button");
 
@@ -29,15 +25,15 @@
           e.preventDefault();
 
           // Ambil nilai input dari form
-          const email = document.querySelector("input[placeholder='User Name']").value;
-          const password = document.querySelector("input[placeholder='Password']").value;
+          const email = document.querySelector("input[placeholder=' Email ']").value;
+          const password = document.querySelector("input[placeholder=' Password ']").value;
 
           // Validasi input
           if (!email || !password) {
             Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              text: 'Please fill in all fields!',
+              icon: "error",
+              title: "Oops...",
+              text: "Please fill in all fields!",
             });
             return;
           }
@@ -46,9 +42,9 @@
           signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
               Swal.fire({
-                icon: 'success',
-                title: 'Login Successful!',
-                text: 'Redirecting to homepage...',
+                icon: "success",
+                title: "Login Successful!",
+                text: "Redirecting to homepage...",
                 showConfirmButton: false,
                 timer: 2000,
               });
@@ -59,87 +55,31 @@
               }, 2000);
             })
             .catch((error) => {
-              if (error.code === "auth/wrong-password") {
+              if (error.code === "auth/user-not-found") {
                 Swal.fire({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: 'Incorrect password!',
+                  icon: "error",
+                  title: "Account Not Found",
+                  text: "This account does not exist. Please sign up first.",
+                  showConfirmButton: true,
+                  confirmButtonText: "Sign Up",
+                }).then(() => {
+                  window.location.href = "signup.html";
                 });
-              } else if (error.code === "auth/user-not-found") {
+              } else if (error.code === "auth/wrong-password") {
                 Swal.fire({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: 'Account does not exist!',
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Incorrect password!",
                 });
               } else {
                 Swal.fire({
-                  icon: 'error',
-                  title: 'Oops...',
+                  icon: "error",
+                  title: "Oops...",
                   text: error.message,
                 });
               }
             });
         });
-      });
-    </script>
-    <script type="module">
-      import { auth } from "./js/firebase-config.js";
-      import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-
-      document.addEventListener("DOMContentLoaded", () => {
-        const loginButton = document.querySelector("#login button");
-        if (loginButton) {
-          loginButton.addEventListener("click", (e) => {
-            e.preventDefault();
-            const email = document.querySelector("input[placeholder='User Name']").value;
-            const password = document.querySelector("input[placeholder='Password']").value;
-
-            if (!email || !password) {
-              Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Please fill in all fields!",
-              });
-              return;
-            }
-
-            signInWithEmailAndPassword(auth, email, password)
-              .then((userCredential) => {
-                Swal.fire({
-                  icon: "success",
-                  title: "Login Successful!",
-                  text: "Redirecting to homepage...",
-                  showConfirmButton: false,
-                  timer: 2000,
-                });
-
-                setTimeout(() => {
-                  window.location.href = "index.html";
-                }, 2000);
-              })
-              .catch((error) => {
-                if (error.code === "auth/wrong-password") {
-                  Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Incorrect password!",
-                  });
-                } else if (error.code === "auth/user-not-found") {
-                  Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Account does not exist!",
-                  });
-                } else {
-                  Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: error.message,
-                  });
-                }
-              });
-          });
-        }
       });
     </script>
 </head>
@@ -218,8 +158,8 @@
             <div class="col-md-8" id="side2">
                 <h3>Login Account</h3>
                 <div class="inp">
-                    <input type="text" placeholder="User Name" required>
-                    <input type="password" placeholder="Password" required>
+                    <input type="text" placeholder=" Email " required>
+                    <input type="password" placeholder=" Password " required>
                 </div>
                 <p>Forgot Your Password?</p>
                 <div class="icons">

@@ -407,10 +407,36 @@
 }
 /* product cards */
 
+/* actions */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
 
+.actions i {
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
 
+.actions .wishlist-icon {
+  color: #ff69b4; /* Warna pink untuk ikon hati */
+}
 
+.actions .wishlist-icon:hover {
+  color: #ff1493; /* Warna pink lebih gelap saat hover */
+}
 
+.actions .cart-icon {
+  color: #4caf50; /* Warna hijau untuk ikon keranjang */
+}
+
+.actions .cart-icon:hover {
+  color: #388e3c; /* Warna hijau lebih gelap saat hover */
+}
+/* actions */
 
 /* offer */
 #offer{
@@ -656,4 +682,192 @@ html{
     background-color: #1c1c50;
     color: white;
 }
-/* contact */
+
+/* General Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Page Title */
+.page-title {
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #1c1c50;
+}
+
+/* Section Styles */
+.section {
+    margin-bottom: 30px;
+}
+
+.section h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #1c1c50;
+}
+
+/* List Styles */
+.list {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.address-item, .product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.address-item:last-child, .product-item:last-child {
+    border-bottom: none;
+}
+
+/* Buttons */
+.btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #388e3c;
+}
+
+.btn-delete {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-delete:hover {
+    background-color: #d32f2f;
+}
+
+.btn-primary {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Input Fields */
+.input {
+    padding: 10px;
+    width: calc(100% - 120px);
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Input Alamat */
+.address-input {
+    padding: 8px;
+    width: calc(100% - 80px); /* Kurangi lebar tombol delete */
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.address-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.btn-delete {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-delete:hover {
+    background-color: #d32f2f;
+}
+
+/* Dropdown */
+.dropdown {
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Total Payment */
+.total {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    text-align: right;
+}
+
+/* Product Quantity */
+.product-quantity {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-sm {
+    font-size: 12px;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
