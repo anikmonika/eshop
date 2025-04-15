@@ -1,6 +1,7 @@
 # eshop
 **ASSIGNMENT 13**
 
+
  saya membuat ecommerce web untuk tugas akhir
  sejauh ini saya menggunakan:
  - Frontend HTML
@@ -12,6 +13,7 @@ layanan cloud yang sudah saya gunakan di App ini:
 - firebase authentication
 
 **ASSIGNMENT 14**
+
 
 proyek ini merupakan aplikasi e-commerce yang sedang saya kembangkan sebagai tugas akhir. Fungsi yang digunakan meliputi HTML untuk frontend, Node.js untuk backend, dan layanan Firebase sebagai Backend-as-a-Service (BaaS).​
 
@@ -48,6 +50,8 @@ untuk spesifik lanjut mengenai fitur yang lain masih saya kembangkan dan on prog
 
 
 **ASSIGNMENT 15**
+
+
 Laporan lanjutan:
 - webmailer menggunakan Firebase yaitu setelah user register akan dikirim email untuk verifikasi sudah saya tambahkan.
 - fitur register dan login menggunakan Firebase Authentication sudah di tambahkan.
@@ -104,4 +108,13 @@ Proyek masih dalam tahap pengembangan. Berikut beberapa hal yang direncanakan da
  - Menambahkan halaman histori transaksi pengguna.
  - Menambahkan validasi data di frontend (misalnya validasi jumlah item, validasi form alamat).
  - Mengintegrasikan notifikasi sederhana (misalnya notifikasi pembayaran berhasil).
+
+   *PAYMENT CRUD*
+![payment CRUD](https://github.com/user-attachments/assets/949994d6-faf7-4f33-a654-ccfc9dd79eb6)
+
+*CART CRUD*
+![cart CRUD](https://github.com/user-attachments/assets/98915711-b15a-4093-9858-a98667b1a28b)
+
+*WISHLIST CRUD*
+![wishlist CRUD](https://github.com/user-attachments/assets/a013c16d-5b8a-4d11-9e20-0f35e5bbc0c3)
 
