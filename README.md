@@ -45,3 +45,63 @@ untuk spesifik lanjut mengenai fitur yang lain masih saya kembangkan dan on prog
 
 5. wishlist saya juga menambahkan CRUD
 ![wishlist](https://github.com/user-attachments/assets/1b66d88b-d4c9-4f10-93d3-82571f95efa6)
+
+
+**ASSIGNMENT 15**
+Laporan lanjutan:
+- webmailer menggunakan Firebase yaitu setelah user register akan dikirim email untuk verifikasi sudah saya tambahkan.
+- fitur register dan login menggunakan Firebase Authentication sudah di tambahkan.
+-  total 12 CRUD (misal 3 fungsi create, 3 fungsi read, 3 fungsi update, dan 3 fungsi delete) yang dikoneksikan ke Firebase Realtime Database, belum semua terpenuhi.
+- penambahan CSS pada setiap halaman
+
+  
+**1. Fitur-Fitur yang Telah Diimplementasikan**
+a. Halaman Cart (Keranjang)
+   - Fitur Tambah Produk ke Cart: Pengguna dapat menambahkan produk dari halaman produk ke dalam keranjang belanja.
+   - Fitur Hapus Produk dari Cart: Pengguna dapat menghapus produk yang tidak diinginkan dari daftar cart.
+   - Fitur Modifikasi Jumlah Produk: Pengguna dapat menambah atau mengurangi jumlah item yang ingin dibeli langsung dari halaman cart.
+   - Integrasi ke Firebase Database: Semua perubahan yang dilakukan pada cart langsung tersimpan di Firebase Realtime Database dan terhubung dengan akun pengguna masing-masing melalui Firebase Authentication.
+
+b. Halaman Payment (Pembayaran)
+- Proses Pembayaran: Terdapat halaman khusus untuk melakukan konfirmasi pembayaran. Pengguna akan diarahkan ke halaman ini setelah menyelesaikan belanja.
+- Penambahan Alamat Pengiriman: Pengguna dapat menambahkan atau memilih alamat pengiriman saat proses checkout. Alamat ini disimpan dan bisa digunakan kembali.
+- Metode Pembayaran: Pengguna bisa memilih metode pembayaran yang diinginkan, misalnya transfer bank atau metode lainnya (mocked untuk tahap awal).
+- Data Pembayaran Tersimpan: Informasi pembayaran yang dikonfirmasi oleh pengguna disimpan ke Firebase Database agar bisa diakses kembali.
+
+c. Desain dan Tampilan (CSS)
+- Penggunaan CSS di Semua Halaman: Seluruh halaman pada aplikasi sudah menggunakan CSS yang seragam, baik untuk layout, warna, ukuran font, dan tombol navigasi.
+- Responsif: Desain mendukung tampilan di berbagai ukuran layar (mobile-friendly).
+- Tema Warna: Warna utama dan sekunder sudah diatur untuk menciptakan kesan profesional dan menarik.
+
+**2. Implementasi CRUD**
+Dalam aplikasi ini, konsep CRUD (Create, Read, Update, Delete) sudah saya terapkan. Namun, dari total 12 operasi CRUD yang direncanakan, baru 9 operasi yang telah berhasil diimplementasikan.
+
+Operasi CRUD yang Sudah Diimplementasikan:
+ 1	Tambah Produk ke Cart	Create	Menyimpan produk baru ke keranjang di database
+ 2	Tampilkan Isi Cart	Read	Menampilkan isi cart dari Firebase
+ 3	Modifikasi Jumlah Produk	Update	Mengubah jumlah item di cart
+ 4	Hapus Produk dari Cart	Delete	Menghapus produk dari cart
+ 5	Tambah Alamat Pengiriman	Create	Menambahkan alamat baru ke database
+ 6	Tampilkan Alamat yang Tersimpan	Read	Membaca data alamat dari Firebase
+ 7	Pilih / Update Alamat	Update	Memilih dan mengedit alamat lama
+ 8	Simpan Informasi Pembayaran	Create	Menyimpan info pembayaran pengguna
+ 9	Tampilkan Riwayat Pembayaran	Read	Menampilkan histori pembayaran (sementara)
+
+CRUD yang Belum Selesai:
+ - Update Metode Pembayaran: Belum disediakan fitur untuk mengubah metode pembayaran yang tersimpan.
+ - Delete Alamat Pengiriman: Fitur untuk menghapus alamat yang tersimpan belum diimplementasikan.
+ - Update Informasi Pembayaran: Fitur untuk memperbarui data pembayaran jika terjadi perubahan masih dalam tahap pengembangan.
+
+**3. Koneksi Firebase**
+Seluruh fitur yang telah berjalan sudah terkoneksi dengan Firebase:
+ - Firebase Authentication: Digunakan untuk login dan register pengguna.
+ - Firebase Realtime Database: Menyimpan data cart, alamat pengiriman, dan histori pembayaran pengguna.
+ - Struktur Data Firebase: Data tersimpan dalam struktur JSON yang mengikuti user ID, sehingga masing-masing pengguna memiliki data terpisah dan aman.
+
+**4. Status dan Rencana Selanjutnya**
+Proyek masih dalam tahap pengembangan. Berikut beberapa hal yang direncanakan dalam progres selanjutnya:
+ - Menyelesaikan 3 fitur CRUD yang belum selesai.
+ - Menambahkan halaman histori transaksi pengguna.
+ - Menambahkan validasi data di frontend (misalnya validasi jumlah item, validasi form alamat).
+ - Mengintegrasikan notifikasi sederhana (misalnya notifikasi pembayaran berhasil).
+
