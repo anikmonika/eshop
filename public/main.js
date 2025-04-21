@@ -21,7 +21,7 @@ function login() {
     const password = document.getElementById("password").value;
 
     signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+        .then(() => {
             alert("Login Berhasil!");
         })
         .catch((error) => {
