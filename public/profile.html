@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="top-navbar">
+        <div class="top-icons">
+            <i class="fa-brands fa-twitter"></i>
+            <i class="fa-brands fa-facebook-f"></i>
+            <i class="fa-brands fa-instagram"></i>
+        </div>
+        <div class="other-links">
+            <button id="btn-logout">Logout</button>
+            <i class="fa-solid fa-user" id="profile-icon"></i>
+            <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a>
+            <a href="wishlist.html"><i class="fa-solid fa-heart"></i></a>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg" id="navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><img src="image/logo.png" alt="" width="150px"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span><i class="fa-solid fa-bars" style="color: white;"></i></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="clothe.html">Clothe</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Section -->
+    <div class="container profile-section">
+        <h1 class="text-center">Your Profile</h1>
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <h2>Profile Picture</h2>
+                <img id="display-image" src="image/placeholder.png" alt="Profile Image" class="img-thumbnail" width="150">
+                <input type="file" id="profile-image" class="form-control mt-3" accept="image/*">
+            </div>
+            <div class="col-md-8">
+                <form id="profile-form">
+                    <input type="hidden" id="user-id">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name:</label>
+                        <input type="text" id="name" class="form-control" placeholder="Enter your name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email:</label>
+                        <input type="email" id="email" class="form-control" placeholder="Enter your email" required readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone:</label>
+                        <input type="text" id="phone" class="form-control" placeholder="Enter your phone number" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address:</label>
+                        <textarea id="address" class="form-control" placeholder="Enter your address" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role:</label>
+                        <select id="role" class="form-select" required>
+                            <option value="customer">Customer</option>
+                            <option value="seller">Seller</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <button type="submit" id="save-profile" class="btn btn-primary">Save Profile</button>
+                    <button type="button" id="delete-profile" class="btn btn-danger">Delete Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="footer-top">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 footer-content">
+                        <h3>Fashion</h3>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus, hic?</p>
+                        <p>
+                            Singapore <br>
+                            768433 <br>
+                        </p>
+                        <strong><i class="fas fa-phone"></i> Phone: <strong>+65 91426096</strong></strong><br>
+                        <strong><i class="fa-solid fa-envelope"></i> Email: <strong>anikmonica28@gmail.com</strong></strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, update, remove } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
+        import { firebaseConfig } from "./js/firebase-config.js";
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        const storage = getStorage(app);
+
+        // DOM Elements
+        const profileForm = document.getElementById("profile-form");
+        const userIdInput = document.getElementById("user-id");
+        const nameInput = document.getElementById("name");
+        const emailInput = document.getElementById("email");
+        const phoneInput = document.getElementById("phone");
+        const addressInput = document.getElementById("address");
+        const roleInput = document.getElementById("role");
+        const profileImageInput = document.getElementById("profile-image");
+        const displayImage = document.getElementById("display-image");
+
+        // Load Profile Data
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const userId = user.uid;
+                userIdInput.value = userId;
+
+                const userRef = ref(database, `profiles/${userId}`);
+                get(userRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        nameInput.value = data.name || "";
+                        emailInput.value = data.email || user.email;
+                        phoneInput.value = data.phone || "";
+                        addressInput.value = data.address || "";
+                        roleInput.value = data.role || "customer";
+                        if (data.profileImage) {
+                            displayImage.src = data.profileImage;
+                        }
+                    } else {
+                        // Create default profile if not exists
+                        set(userRef, {
+                            name: user.displayName || "",
+                            email: user.email,
+                            phone: "",
+                            address: "",
+                            role: "customer",
+                            profileImage: "image/placeholder.png",
+                        });
+                    }
+                });
+            } else {
+                window.location.href = "login.html"; // Redirect to login if not logged in
+            }
+        });
+
+        // Save Profile
+        profileForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const userId = userIdInput.value;
+            const userRef = ref(database, `profiles/${userId}`);
+
+            let profileImageUrl = displayImage.src;
+
+            if (profileImageInput.files.length > 0) {
+                const file = profileImageInput.files[0];
+                const validImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+                // Validasi format file
+                if (!validImageTypes.includes(file.type)) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Invalid File Type",
+                        text: "Please upload a valid image file (jpg, png, gif, webp).",
+                    });
+                    return;
+                }
+
+                const storagePath = storageRef(storage, `profileImages/${userId}`);
+                await uploadBytes(storagePath, file);
+                profileImageUrl = await getDownloadURL(storagePath);
+            }
+
+            const profileData = {
+                name: nameInput.value,
+                email: emailInput.value,
+                phone: phoneInput.value,
+                address: addressInput.value,
+                role: roleInput.value,
+                profileImage: profileImageUrl,
+            };
+
+            update(userRef, profileData)
+                .then(() => {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Profile Saved",
+                        text: "Your profile has been updated successfully.",
+                    });
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: error.message,
+                    });
+                });
+        });
+
+        // Logout Button
+        const logoutButton = document.getElementById("btn-logout");
+        logoutButton.addEventListener("click", () => {
+            signOut(auth)
+                .then(() => {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Logged Out",
+                        text: "You have been logged out successfully.",
+                    }).then(() => {
+                        window.location.href = "login.html"; // Redirect to login page
+                    });
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: error.message,
+                    });
+                });
+        });
+    </script>
+</body>
+</html>

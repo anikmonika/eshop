@@ -142,7 +142,7 @@
         <div class="other-links">
             <button id="btn-login"><a href="login.html">Login</a></button>
             <button id="btn-signup"><a href="signup.html">Sign up</a></button>
-            <i class="fa-solid fa-user"></i>
+            <i class="fa-solid fa-user" id="profile-icon"></i>
             <i class="fa-solid fa-cart-shopping"></i>
         </div>
     </div>
@@ -226,6 +226,18 @@
         // Redirect ke halaman payment.html
         window.location.href = "payment.html";
       });
+    </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const profileIcon = document.querySelector("#profile-icon");
+
+        if (profileIcon) {
+            profileIcon.addEventListener("click", () => {
+                window.location.href = "profile.html"; // Redirect ke halaman profil
+            });
+        }
+    });
     </script>
 
     <!-- footer -->

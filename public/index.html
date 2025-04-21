@@ -25,8 +25,9 @@
         <div class="other-links">
             <button id="btn-login"><a href="login.html">Login</a></button>
             <button id="btn-signup"><a href="signup.html">Sign up</a></button>
-            <i class="fa-solid fa-user"></i>
+            <i class="fa-solid fa-user" id="profile-icon"></i>
             <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i></a>
+            <a href="wishlist.html"><i class="fa-solid fa-heart"></i></a>
         </div>
     </div>
 
@@ -56,7 +57,7 @@
                     <li class="nav-item"><a class="nav-link" href="contact.html">Contact Us</a></li>
                 </ul>
                 <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="search-input">
                     <button class="btn btn-outline-success" type="submit" id="search-btn">Search</button>
                 </form>
             </div>
@@ -278,7 +279,7 @@
                             <i class="fas fa-star checked"></i>
                         </div>
                         <h5>$3.2 <strike>$5.60</strike></h5>
-                        <div class="actions d-flex justify-content-between">
+                        <div class="actions d-flex justify-content_between">
                             <i class="fa-solid fa-heart wishlist-icon"></i>
                             <i class="fa-solid fa-cart-shopping cart-icon"></i>
                         </div>
@@ -412,123 +413,197 @@
 <a href="#" class="arrow"><i><img src="./image/up-arrow.png" alt="" width="50px"></i></a>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        // Event listener untuk tombol Cart
-        document.getElementById("btn-cart").addEventListener("click", () => {
-            window.location.href = "cart.html"; // Redirect ke halaman cart
+    <script type="module" src="./js/firebase-config.js"></script>
+    <script type="module">
+        import { database, ref, push } from "./js/firebase-config.js";
+
+        // Fungsi untuk menambahkan produk ke keranjang
+        function addToCart(product) {
+            const cartRef = ref(database, "cart");
+            push(cartRef, product)
+                .then(() => {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Added to Cart",
+                        text: `${product.name} has been added to your cart.`,
+                        timer: 1500,
+                        showConfirmButton: false,
+                    });
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: `Failed to add to cart: ${error.message}`,
+                    });
+                });
+        }
+
+        // Fungsi untuk menambahkan produk ke wishlist
+        function addToWishlist(product) {
+            const wishlistRef = ref(database, "wishlist");
+            push(wishlistRef, product)
+                .then(() => {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Added to Wishlist",
+                        text: `${product.name} has been added to your wishlist.`,
+                        timer: 1500,
+                        showConfirmButton: false,
+                    });
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: `Failed to add to wishlist: ${error.message}`,
+                    });
+                });
+        }
+
+        // Tambahkan event listener ke semua ikon keranjang dan wishlist
+        document.addEventListener("DOMContentLoaded", () => {
+            const cartIcons = document.querySelectorAll(".cart-icon");
+            cartIcons.forEach((icon) => {
+                icon.addEventListener("click", (e) => {
+                    e.preventDefault();
+
+                    const productCard = icon.closest(".card");
+                    if (!productCard) {
+                        console.error("Product card not found for the clicked cart icon.");
+                        return;
+                    }
+
+                    const productName = productCard.querySelector("h3")?.textContent || "Unknown Product";
+                    const productPriceElement = productCard.querySelector("h5");
+                    const productPrice = productPriceElement
+                        ? parseFloat(productPriceElement.textContent.split(" ")[0].replace("$", ""))
+                        : null;
+                    const productImage = productCard.querySelector("img")?.src || "";
+
+                    if (!productName || productPrice === null || !productImage) {
+                        console.error("Failed to retrieve product details.");
+                        return;
+                    }
+
+                    const product = {
+                        name: productName,
+                        price: productPrice,
+                        image: productImage,
+                        quantity: 1,
+                    };
+
+                    addToCart(product);
+                });
+            });
+
+            const wishlistIcons = document.querySelectorAll(".wishlist-icon");
+            wishlistIcons.forEach((icon) => {
+                icon.addEventListener("click", (e) => {
+                    e.preventDefault();
+
+                    const productCard = icon.closest(".card");
+                    if (!productCard) {
+                        console.error("Product card not found for the clicked wishlist icon.");
+                        return;
+                    }
+
+                    const productName = productCard.querySelector("h3")?.textContent || "Unknown Product";
+                    const productPriceElement = productCard.querySelector("h5");
+                    const productPrice = productPriceElement
+                        ? parseFloat(productPriceElement.textContent.split(" ")[0].replace("$", ""))
+                        : null;
+                    const productImage = productCard.querySelector("img")?.src || "";
+
+                    if (!productName || productPrice === null || !productImage) {
+                        console.error("Failed to retrieve product details.");
+                        return;
+                    }
+
+                    const product = {
+                        name: productName,
+                        price: productPrice,
+                        image: productImage,
+                        quantity: 1,
+                    };
+
+                    addToWishlist(product);
+                });
+            });
+        });
+    </script>
+    <script type="module">
+    document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.querySelector("#search-input");
+        const searchButton = document.querySelector("#search-btn");
+        const productCards = document.querySelectorAll(".card");
+        const productContainer = document.querySelector("#product-cards .row");
+        const productSection = document.querySelector("#product-cards");
+
+        searchButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            const searchTerm = searchInput.value.trim().toLowerCase();
+
+            if (!searchTerm) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Empty Search",
+                    text: "Please enter a keyword to search.",
+                });
+                return;
+            }
+
+            let foundProducts = [];
+            productCards.forEach((card) => {
+                const productNameElement = card.querySelector("h3");
+                if (productNameElement) {
+                    const productName = productNameElement.textContent.toLowerCase();
+                    if (productName.includes(searchTerm)) {
+                        foundProducts.push(card);
+                    }
+                }
+            });
+
+            // Clear the product container
+            productContainer.innerHTML = "";
+
+            if (foundProducts.length > 0) {
+                // Display found products
+                foundProducts.forEach((product) => {
+                    productContainer.appendChild(product);
+                });
+            } else {
+                // Display "Product not found" message and suggest other products
+                productContainer.innerHTML = `
+                    <div class="col-12 text-center">
+                        <h3>Product not found</h3>
+                        <p>We couldn't find any product matching your search. Here are some suggestions:</p>
+                    </div>
+                `;
+
+                // Suggest other products
+                productCards.forEach((card, index) => {
+                    if (index < 4) {
+                        productContainer.appendChild(card);
+                    }
+                });
+            }
+
+            // Scroll to the product section
+            productSection.scrollIntoView({ behavior: "smooth" });
+        });
     });
-  </script>
-<script type="module" src="./js/firebase-config.js"></script>
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const profileIcon = document.querySelector("#profile-icon");
 
-<script type="module">
-  import { database, ref, push } from "./js/firebase-config.js";
-
-  // Fungsi untuk menambahkan produk ke keranjang
-  function addToCart(product) {
-    const cartRef = ref(database, "cart");
-    push(cartRef, product)
-      .then(() => {
-        Swal.fire({
-          icon: "success",
-          title: "Added to Cart",
-          text: `${product.name} has been added to your cart.`,
-          timer: 1500,
-          showConfirmButton: false,
-        });
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: `Failed to add to cart: ${error.message}`,
-        });
-      });
-  }
-
-  // Fungsi untuk menambahkan produk ke wishlist
-  function addToWishlist(product) {
-    const wishlistRef = ref(database, "wishlist");
-    push(wishlistRef, product)
-      .then(() => {
-        Swal.fire({
-          icon: "success",
-          title: "Added to Wishlist",
-          text: `${product.name} has been added to your wishlist.`,
-          timer: 1500,
-          showConfirmButton: false,
-        });
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: `Failed to add to wishlist: ${error.message}`,
-        });
-      });
-  }
-
-  // Fungsi untuk mengambil detail produk dari elemen kartu
-  function getProductDetails(productCard) {
-    const productName = productCard.querySelector("h3")?.textContent || "Unknown Product";
-    const productPriceElement = productCard.querySelector("h5");
-    const productPrice = productPriceElement
-      ? parseFloat(productPriceElement.textContent.split(" ")[0].replace("$", ""))
-      : null;
-    const productImage = productCard.querySelector("img")?.src || "";
-
-    if (!productName || productPrice === null || !productImage) {
-      console.error("Failed to retrieve product details.");
-      return null;
-    }
-
-    return {
-      name: productName,
-      price: productPrice,
-      image: productImage,
-      quantity: 1, // Default quantity
-    };
-  }
-
-  // Tambahkan event listener ke semua ikon keranjang dan wishlist
-  document.addEventListener("DOMContentLoaded", () => {
-    // Event listener untuk ikon keranjang
-    const cartIcons = document.querySelectorAll(".cart-icon");
-    cartIcons.forEach((icon) => {
-      icon.addEventListener("click", (e) => {
-        e.preventDefault();
-
-        const productCard = icon.closest(".card");
-        if (!productCard) {
-          console.error("Product card not found for the clicked cart icon.");
-          return;
+        if (profileIcon) {
+            profileIcon.addEventListener("click", () => {
+                window.location.href = "profile.html"; // Redirect ke halaman profil
+            });
         }
-
-        const product = getProductDetails(productCard);
-        if (product) {
-          addToCart(product);
-        }
-      });
     });
-
-    // Event listener untuk ikon wishlist
-    const wishlistIcons = document.querySelectorAll(".wishlist-icon");
-    wishlistIcons.forEach((icon) => {
-      icon.addEventListener("click", (e) => {
-        e.preventDefault();
-
-        const productCard = icon.closest(".card");
-        if (!productCard) {
-          console.error("Product card not found for the clicked wishlist icon.");
-          return;
-        }
-
-        const product = getProductDetails(productCard);
-        if (product) {
-          addToWishlist(product);
-        }
-      });
-    });
-  });
 </script>
 </body>
 </html>

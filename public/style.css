@@ -871,3 +871,205 @@ body {
 .btn-danger:hover {
     background-color: #c82333;
 }
+
+/* Navbar */
+.navbar-brand img {
+    width: 150px; /* Kurangi ukuran logo */
+}
+
+/* Home Section */
+.home-section .home .content h3 {
+    font-size: 2rem; /* Kurangi ukuran teks utama */
+}
+
+.home-section .home .content p {
+    font-size: 1rem; /* Kurangi ukuran deskripsi */
+}
+
+.home-section .home .img img {
+    max-width: 80%; /* Kurangi ukuran gambar */
+    height: auto;
+}
+
+/* Top Cards */
+#top-cards .card {
+    max-width: 300px; /* Batasi lebar kartu */
+    margin: 0 auto; /* Pusatkan kartu */
+}
+
+#top-cards .card img {
+    max-width: 100%; /* Pastikan gambar tidak melebihi kartu */
+    height: auto;
+}
+
+#top-cards .card .card-img-overlay h5 {
+    font-size: 1.2rem; /* Kurangi ukuran teks judul */
+}
+
+#top-cards .card .card-img-overlay p {
+    font-size: 0.9rem; /* Kurangi ukuran deskripsi */
+}
+
+/* Product Cards */
+#product-cards .card {
+    max-width: 250px; /* Batasi lebar kartu produk */
+    margin: 0 auto; /* Pusatkan kartu */
+}
+
+#product-cards .card img {
+    max-width: 100%; /* Pastikan gambar tidak melebihi kartu */
+    height: auto;
+}
+
+#product-cards .card h3 {
+    font-size: 1.1rem; /* Kurangi ukuran judul produk */
+    text-align: center;
+}
+
+#product-cards .card h5 {
+    font-size: 1rem; /* Kurangi ukuran harga */
+    text-align: center;
+}
+
+#product-cards .card p {
+    font-size: 0.9rem; /* Kurangi ukuran deskripsi */
+    text-align: center;
+}
+
+/* Footer */
+.footer-top .footer-content h3 {
+    font-size: 1.5rem; /* Kurangi ukuran judul footer */
+}
+
+.footer-top .footer-content p {
+    font-size: 0.9rem; /* Kurangi ukuran teks footer */
+}
+
+.footer-links h4 {
+    font-size: 1.2rem; /* Kurangi ukuran judul link footer */
+}
+
+.footer-links ul li a {
+    font-size: 0.9rem; /* Kurangi ukuran teks link footer */
+}
+
+/* Responsif untuk Desktop */
+@media (min-width: 992px) {
+    .container {
+        max-width: 1200px; /* Batasi lebar kontainer */
+    }
+}
+
+/* Profile Section */
+.profile-section {
+    margin-top: 50px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-section h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.profile-section .profile-picture {
+    margin-bottom: 20px;
+}
+
+.profile-section .profile-picture img {
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+.profile-section .profile-picture input {
+    margin-top: 15px;
+}
+
+.profile-section .form-label {
+    font-weight: bold;
+    color: #555;
+}
+
+.profile-section .form-control {
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.profile-section .btn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.profile-section .btn-primary {
+    background-color: #007bff;
+    border: none;
+    color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+.profile-section .btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.profile-section .btn-danger {
+    background-color: #dc3545;
+    border: none;
+    color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+.profile-section .btn-danger:hover {
+    background-color: #a71d2a;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .profile-section {
+        padding: 15px;
+    }
+
+    .profile-section h1 {
+        font-size: 1.5rem;
+    }
+
+    .profile-section .profile-picture img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .profile-section .btn {
+        font-size: 0.9rem;
+    }
+}
+
+.profile-section {
+    margin-top: 50px;
+}
+
+.profile-section h1 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+.profile-section .form-label {
+    font-weight: bold;
+}
+
+.profile-section .btn {
+    margin-right: 10px;
+}
+
+.profile-section img {
+    margin-top: 20px;
+    border-radius: 10px;
+}

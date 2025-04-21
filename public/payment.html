@@ -15,7 +15,6 @@
         <!-- CRUD Address -->
         <section id="address-section" class="section">
             <h2>Shipping Address</h2>
-            <!-- Input untuk alamat -->
             <div id="address-inputs" class="address-inputs">
                 <input type="text" id="full-address" class="address-input" placeholder="Full Address">
                 <input type="text" id="phone-number" class="address-input" placeholder="Phone Number">
@@ -23,10 +22,8 @@
                 <input type="text" id="postal-code" class="address-input" placeholder="Postal Code">
             </div>
             <button id="add-address-btn" class="btn">Add Address</button>
-
-            <!-- Daftar alamat -->
             <div id="address-list" class="list">
-                <!-- Alamat akan dirender di sini -->
+                <!-- Address list will be dynamically populated -->
             </div>
         </section>
 
@@ -46,13 +43,31 @@
                 <option value="paypal">PayPal</option>
                 <option value="bank-transfer">Bank Transfer</option>
             </select>
-        </section>
 
-        <!-- Voucher Discount -->
-        <section id="voucher-section" class="section">
-            <h2>Voucher</h2>
-            <input type="text" id="voucher-code" class="input" placeholder="Enter voucher code">
-            <button id="apply-voucher-btn" class="btn">Apply</button>
+            <!-- Credit Card Details -->
+            <div id="credit-card-details" class="payment-details" style="display: none;">
+                <h3>Credit Card Details</h3>
+                <input type="text" id="card-number" class="payment-input" placeholder="Card Number">
+                <input type="text" id="card-holder" class="payment-input" placeholder="Card Holder Name">
+                <input type="text" id="expiry-date" class="payment-input" placeholder="Expiry Date (MM/YY)">
+                <input type="text" id="cvv" class="payment-input" placeholder="CVV">
+                <button id="add-card-btn" class="btn">Add Card</button>
+                <div id="card-list" class="list">
+                    <!-- Card list will be dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Bank Transfer Details -->
+            <div id="bank-transfer-details" class="payment-details" style="display: none;">
+                <h3>Bank Transfer Details</h3>
+                <input type="text" id="account-number" class="payment-input" placeholder="Account Number">
+                <input type="text" id="account-holder" class="payment-input" placeholder="Account Holder Name">
+                <input type="text" id="bank-name" class="payment-input" placeholder="Bank Name">
+                <button id="add-bank-btn" class="btn">Add Bank Account</button>
+                <div id="bank-list" class="list">
+                    <!-- Bank account list will be dynamically populated -->
+                </div>
+            </div>
         </section>
 
         <!-- Total Payment -->
@@ -65,239 +80,254 @@
         <button id="place-order-btn" class="btn btn-primary">Place Order</button>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+        import { firebaseConfig } from "./js/firebase-config.js";
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
         // CRUD Address
         const addressList = document.getElementById("address-list");
         const addAddressBtn = document.getElementById("add-address-btn");
 
         addAddressBtn.addEventListener("click", () => {
-            // Ambil nilai dari input
             const fullAddress = document.getElementById("full-address").value.trim();
             const phoneNumber = document.getElementById("phone-number").value.trim();
             const city = document.getElementById("city").value.trim();
             const postalCode = document.getElementById("postal-code").value.trim();
 
-            // Validasi input
             if (!fullAddress || !phoneNumber || !city || !postalCode) {
                 Swal.fire("Error", "Please fill in all address fields.", "error");
                 return;
             }
 
-            // Buat elemen alamat baru
-            const addressItem = document.createElement("div");
-            addressItem.classList.add("address-item");
-            addressItem.innerHTML = `
-                <p><strong>Address:</strong> ${fullAddress}</p>
-                <p><strong>Phone:</strong> ${phoneNumber}</p>
-                <p><strong>City:</strong> ${city}</p>
-                <p><strong>Postal Code:</strong> ${postalCode}</p>
-            `;
+            const addressRef = ref(database, "addresses");
+            push(addressRef, { fullAddress, phoneNumber, city, postalCode })
+                .then(() => {
+                    Swal.fire("Success", "Address added successfully!", "success");
+                    document.getElementById("full-address").value = "";
+                    document.getElementById("phone-number").value = "";
+                    document.getElementById("city").value = "";
+                    document.getElementById("postal-code").value = "";
+                })
+                .catch((error) => {
+                    Swal.fire("Error", error.message, "error");
+                });
+        });
 
-            // Tombol delete untuk menghapus alamat
-            const deleteBtn = document.createElement("button");
-            deleteBtn.textContent = "Delete";
-            deleteBtn.classList.add("btn-delete");
-            deleteBtn.addEventListener("click", () => {
-                addressList.removeChild(addressItem);
+        onValue(ref(database, "addresses"), (snapshot) => {
+            addressList.innerHTML = "";
+            snapshot.forEach((childSnapshot) => {
+                const key = childSnapshot.key;
+                const data = childSnapshot.val();
+
+                const addressItem = document.createElement("div");
+                addressItem.classList.add("address-item");
+                addressItem.innerHTML = `
+                    <p><strong>Address:</strong> ${data.fullAddress}</p>
+                    <p><strong>Phone:</strong> ${data.phoneNumber}</p>
+                    <p><strong>City:</strong> ${data.city}</p>
+                    <p><strong>Postal Code:</strong> ${data.postalCode}</p>
+                    <button class="btn btn-danger btn-sm remove-address" data-key="${key}">Remove</button>
+                `;
+
+                addressList.appendChild(addressItem);
             });
 
-            addressItem.appendChild(deleteBtn);
-
-            // Tambahkan elemen alamat ke daftar alamat
-            addressList.appendChild(addressItem);
-
-            // Kosongkan input setelah ditambahkan
-            document.getElementById("full-address").value = "";
-            document.getElementById("phone-number").value = "";
-            document.getElementById("city").value = "";
-            document.getElementById("postal-code").value = "";
+            document.querySelectorAll(".remove-address").forEach((button) => {
+                button.addEventListener("click", (e) => {
+                    const key = e.target.getAttribute("data-key");
+                    remove(ref(database, `addresses/${key}`));
+                });
+            });
         });
 
         // CRUD Checkout Products
         const productList = document.getElementById("product-list");
-        const products = [
-            { name: "Product 1", price: 50 },
-            { name: "Product 2", price: 30 },
-        ];
-
-        function renderProducts() {
-            productList.innerHTML = "";
-            products.forEach((product, index) => {
-                const productItem = document.createElement("div");
-                productItem.textContent = `${product.name} - $${product.price}`;
-                productItem.classList.add("product-item");
-
-                const deleteBtn = document.createElement("button");
-                deleteBtn.textContent = "Delete";
-                deleteBtn.classList.add("btn-delete");
-                deleteBtn.addEventListener("click", () => {
-                    products.splice(index, 1);
-                    renderProducts();
-                    calculateTotal();
-                });
-
-                productItem.appendChild(deleteBtn);
-                productList.appendChild(productItem);
-            });
-        }
-        renderProducts();
-
-        // CRUD Payment Method
-        const paymentMethodSelect = document.getElementById("payment-method-select");
-
-        paymentMethodSelect.addEventListener("change", () => {
-            console.log(`Selected payment method: ${paymentMethodSelect.value}`);
-        });
-
-        // Voucher Discount
-        const voucherCodeInput = document.getElementById("voucher-code");
-        const applyVoucherBtn = document.getElementById("apply-voucher-btn");
-        let discount = 0;
-
-        applyVoucherBtn.addEventListener("click", () => {
-            const voucherCode = voucherCodeInput.value.trim();
-            if (voucherCode === "DISCOUNT10") {
-                discount = 10;
-                Swal.fire("Voucher Applied", "You received a $10 discount!", "success");
-            } else {
-                discount = 0;
-                Swal.fire("Invalid Voucher", "The voucher code is not valid.", "error");
-            }
-            calculateTotal();
-        });
-
-        // Total Payment
         const totalAmountElement = document.getElementById("total-amount");
 
-        function calculateTotal() {
-            const total = products.reduce((sum, product) => sum + product.price, 0) - discount;
-            totalAmountElement.textContent = `$${total > 0 ? total.toFixed(2) : 0}`;
-        }
-        calculateTotal();
-
-        // Place Order
-        const placeOrderBtn = document.getElementById("place-order-btn");
-
-        placeOrderBtn.addEventListener("click", () => {
-            if (products.length === 0) {
-                Swal.fire("Error", "No products in the cart.", "error");
-                return;
-            }
-
-            if (addressList.children.length === 0) {
-                Swal.fire("Error", "Please add a shipping address.", "error");
-                return;
-            }
-
-            Swal.fire("Order Placed", "Your order has been successfully placed!", "success");
-        });
-
-        // Fungsi untuk menampilkan data checkout di halaman payment.html
-        document.addEventListener("DOMContentLoaded", () => {
-            const checkoutItems = JSON.parse(localStorage.getItem("checkoutItems")) || [];
-            const productList = document.getElementById("product-list");
-
+        onValue(ref(database, "cart"), (snapshot) => {
+            productList.innerHTML = "";
             let total = 0;
 
-            // Render produk yang di-checkout
-            checkoutItems.forEach((item) => {
+            snapshot.forEach((childSnapshot) => {
+                const key = childSnapshot.key;
+                const data = childSnapshot.val();
+
                 const productItem = document.createElement("div");
                 productItem.classList.add("product-item");
                 productItem.innerHTML = `
                     <div class="product-details">
-                        <img src="${item.image}" alt="${item.name}" width="50">
-                        <span>${item.name}</span>
+                        <img src="${data.image || './image/placeholder.png'}" alt="${data.name}" width="50">
+                        <span>${data.name}</span>
                     </div>
-                    <div class="product-quantity">Quantity: ${item.quantity}</div>
-                    <div class="product-price">Price: $${(item.price * item.quantity).toFixed(2)}</div>
+                    <div class="product-quantity">
+                        <button class="btn btn-sm btn-secondary decrease-quantity" data-key="${key}">-</button>
+                        <span class="quantity">${data.quantity}</span>
+                        <button class="btn btn-sm btn-secondary increase-quantity" data-key="${key}">+</button>
+                    </div>
+                    <div class="product-price">Price: $${(data.price * data.quantity).toFixed(2)}</div>
+                    <button class="btn btn-danger btn-sm remove-product" data-key="${key}">Remove</button>
                 `;
 
                 productList.appendChild(productItem);
-                total += item.price * item.quantity;
+                total += data.price * data.quantity;
             });
 
-            // Tampilkan total pembayaran
-            document.getElementById("total-amount").textContent = `$${total.toFixed(2)}`;
-        });
-    </script>
+            totalAmountElement.textContent = `$${total.toFixed(2)}`;
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
-        import { firebaseConfig } from "./js/firebase-config.js"; // Impor konfigurasi Firebase
-
-        // Inisialisasi Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-
-        // Fungsi untuk menampilkan data checkout dari Firebase
-        document.addEventListener("DOMContentLoaded", () => {
-            const productList = document.getElementById("product-list");
-            const totalAmountElement = document.getElementById("total-amount");
-
-            let total = 0;
-
-            // Ambil data dari Firebase Realtime Database
-            const cartRef = ref(database, "cart");
-            onValue(cartRef, (snapshot) => {
-                productList.innerHTML = ""; // Kosongkan daftar produk sebelum render ulang
-                total = 0; // Reset total pembayaran
-
-                snapshot.forEach((childSnapshot) => {
-                    const key = childSnapshot.key;
-                    const data = childSnapshot.val();
-
-                    const productItem = document.createElement("div");
-                    productItem.classList.add("product-item");
-                    productItem.innerHTML = `
-                        <div class="product-details">
-                            <img src="${data.image || './image/placeholder.png'}" alt="${data.name}" width="50">
-                            <span>${data.name}</span>
-                        </div>
-                        <div class="product-quantity">
-                            <button class="btn btn-sm btn-secondary decrease-quantity" data-key="${key}">-</button>
-                            <span class="quantity">${data.quantity}</span>
-                            <button class="btn btn-sm btn-secondary increase-quantity" data-key="${key}">+</button>
-                        </div>
-                        <div class="product-price">Price: $${(data.price * data.quantity).toFixed(2)}</div>
-                        <button class="btn btn-danger btn-sm remove-product" data-key="${key}">Remove</button>
-                    `;
-
-                    productList.appendChild(productItem);
-                    total += data.price * data.quantity;
-                });
-
-                // Tampilkan total pembayaran
-                totalAmountElement.textContent = `$${total.toFixed(2)}`;
-            });
-
-            // Event listener untuk tombol tambah, kurang, dan hapus
             productList.addEventListener("click", (e) => {
                 const key = e.target.getAttribute("data-key");
 
                 if (e.target.classList.contains("increase-quantity")) {
-                    // Tambah jumlah produk
                     const quantityElement = e.target.previousElementSibling;
                     const newQuantity = parseInt(quantityElement.textContent) + 1;
                     update(ref(database, `cart/${key}`), { quantity: newQuantity });
                 }
 
                 if (e.target.classList.contains("decrease-quantity")) {
-                    // Kurangi jumlah produk
                     const quantityElement = e.target.nextElementSibling;
                     const newQuantity = parseInt(quantityElement.textContent) - 1;
                     if (newQuantity > 0) {
                         update(ref(database, `cart/${key}`), { quantity: newQuantity });
                     } else {
-                        remove(ref(database, `cart/${key}`)); // Hapus produk jika jumlahnya 0
+                        remove(ref(database, `cart/${key}`));
                     }
                 }
 
                 if (e.target.classList.contains("remove-product")) {
-                    // Hapus produk
                     remove(ref(database, `cart/${key}`));
                 }
             });
+        });
+
+        // Payment Method Logic
+        const paymentMethodSelect = document.getElementById("payment-method-select");
+        const creditCardDetails = document.getElementById("credit-card-details");
+        const bankTransferDetails = document.getElementById("bank-transfer-details");
+
+        paymentMethodSelect.addEventListener("change", () => {
+            const selectedMethod = paymentMethodSelect.value;
+            creditCardDetails.style.display = selectedMethod === "credit-card" ? "block" : "none";
+            bankTransferDetails.style.display = selectedMethod === "bank-transfer" ? "block" : "none";
+        });
+
+        // CRUD Credit Card
+        const cardList = document.getElementById("card-list");
+        const addCardBtn = document.getElementById("add-card-btn");
+
+        addCardBtn.addEventListener("click", () => {
+            const cardNumber = document.getElementById("card-number").value.trim();
+            const cardHolder = document.getElementById("card-holder").value.trim();
+            const expiryDate = document.getElementById("expiry-date").value.trim();
+            const cvv = document.getElementById("cvv").value.trim();
+
+            if (!cardNumber || !cardHolder || !expiryDate || !cvv) {
+                Swal.fire("Error", "Please fill in all card details.", "error");
+                return;
+            }
+
+            const cardRef = ref(database, "creditCards");
+            push(cardRef, { cardNumber, cardHolder, expiryDate, cvv })
+                .then(() => {
+                    Swal.fire("Success", "Card added successfully!", "success");
+                    document.getElementById("card-number").value = "";
+                    document.getElementById("card-holder").value = "";
+                    document.getElementById("expiry-date").value = "";
+                    document.getElementById("cvv").value = "";
+                })
+                .catch((error) => {
+                    Swal.fire("Error", error.message, "error");
+                });
+        });
+
+        onValue(ref(database, "creditCards"), (snapshot) => {
+            cardList.innerHTML = "";
+            snapshot.forEach((childSnapshot) => {
+                const key = childSnapshot.key;
+                const data = childSnapshot.val();
+
+                const cardItem = document.createElement("div");
+                cardItem.classList.add("card-item");
+                cardItem.innerHTML = `
+                    <p><strong>Card Number:</strong> ${data.cardNumber}</p>
+                    <p><strong>Card Holder:</strong> ${data.cardHolder}</p>
+                    <p><strong>Expiry Date:</strong> ${data.expiryDate}</p>
+                    <button class="btn btn-danger btn-sm remove-card" data-key="${key}">Remove</button>
+                `;
+
+                cardList.appendChild(cardItem);
+            });
+
+            document.querySelectorAll(".remove-card").forEach((button) => {
+                button.addEventListener("click", (e) => {
+                    const key = e.target.getAttribute("data-key");
+                    remove(ref(database, `creditCards/${key}`));
+                });
+            });
+        });
+
+        // CRUD Bank Transfer
+        const bankList = document.getElementById("bank-list");
+        const addBankBtn = document.getElementById("add-bank-btn");
+
+        addBankBtn.addEventListener("click", () => {
+            const accountNumber = document.getElementById("account-number").value.trim();
+            const accountHolder = document.getElementById("account-holder").value.trim();
+            const bankName = document.getElementById("bank-name").value.trim();
+
+            if (!accountNumber || !accountHolder || !bankName) {
+                Swal.fire("Error", "Please fill in all bank details.", "error");
+                return;
+            }
+
+            const bankRef = ref(database, "bankAccounts");
+            push(bankRef, { accountNumber, accountHolder, bankName })
+                .then(() => {
+                    Swal.fire("Success", "Bank account added successfully!", "success");
+                    document.getElementById("account-number").value = "";
+                    document.getElementById("account-holder").value = "";
+                    document.getElementById("bank-name").value = "";
+                })
+                .catch((error) => {
+                    Swal.fire("Error", error.message, "error");
+                });
+        });
+
+        onValue(ref(database, "bankAccounts"), (snapshot) => {
+            bankList.innerHTML = "";
+            snapshot.forEach((childSnapshot) => {
+                const key = childSnapshot.key;
+                const data = childSnapshot.val();
+
+                const bankItem = document.createElement("div");
+                bankItem.classList.add("bank-item");
+                bankItem.innerHTML = `
+                    <p><strong>Account Number:</strong> ${data.accountNumber}</p>
+                    <p><strong>Account Holder:</strong> ${data.accountHolder}</p>
+                    <p><strong>Bank Name:</strong> ${data.bankName}</p>
+                    <button class="btn btn-danger btn-sm remove-bank" data-key="${key}">Remove</button>
+                `;
+
+                bankList.appendChild(bankItem);
+            });
+
+            document.querySelectorAll(".remove-bank").forEach((button) => {
+                button.addEventListener("click", (e) => {
+                    const key = e.target.getAttribute("data-key");
+                    remove(ref(database, `bankAccounts/${key}`));
+                });
+            });
+        });
+
+        // Place Order
+        const placeOrderBtn = document.getElementById("place-order-btn");
+
+        placeOrderBtn.addEventListener("click", () => {
+            Swal.fire("Order Placed", "Your order has been successfully placed!", "success");
         });
     </script>
 </body>
